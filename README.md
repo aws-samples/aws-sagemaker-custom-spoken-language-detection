@@ -2,7 +2,7 @@
 
 ## Summary 
 
-Many speech recognition services, such as Amazon Transcribe, require knowledge of the language being spoken in each audio file in order to run a transcription job.  If the language is unknown or if you intend on transcribing a batch of audio files that vary in language from file to file, pre-determining the languages can be time consuming.  In this post, I will demonstrate how to train and deploy a spoken language classifier on SageMaker, using an open-source dataset, VoxForge, and integrate it with Transcribe to achieve automatic multilingual speech recognition.
+Amazon Transcribe is a fully managed transcription service, currently supporting 31 languages, that makes it easy to integrate speech-to-text capabilities into your application. If the language of your audio file is unknown or you intend on transcribing a batch of audio files that vary in languages, Transcribe currently has the ability to auto-detect the dominant language for any given audio file prior to running any transcription job. The feature, called Language ID, leverages a separate model that classifies the dominant language being spoken in the audio file and reports a confidence score for each of the possible transcription languages. While effective for most applications out-of-the-box, this model does not currently have the ability to be retrained using custom data. Training a custom language detection model allows you to hone the model to specific accents, background noise levels, speech distortions, and other characteristics unique to your use case. This project demonstrates how to train and deploy a custom spoken language classifier on SageMaker to automatically detect languages of audio files before being transcribed by Amazon Transcribe.
 
 ## Getting Started
 
