@@ -1,4 +1,4 @@
-## Build a Customized Recommender System on Amazon SageMaker
+## Build a Custom Spoken Language Detection Model on Amazon SageMaker
 
 ## Summary 
 
