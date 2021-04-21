@@ -1,0 +1,6 @@
+librosa==0.7.2
+sagemaker-training 
+s3fs
+flask
+gevent
+gunicorn

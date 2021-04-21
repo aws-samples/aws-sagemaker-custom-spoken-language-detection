@@ -1,0 +1,52 @@
+FROM continuumio/anaconda3:latest
+
+RUN apt-get autoclean && apt-get autoremove && apt-get clean
+
+# install packages
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
+        gcc \
+        build-essential \
+        wget \
+        nginx \
+        nano \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# install libsndfile from source
+RUN wget http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28.tar.gz \
+    && tar -xzf libsndfile-1.0.28.tar.gz
+RUN cd libsndfile-1.0.28 && ./configure --prefix=/usr --disable-static --docdir=/usr/share/doc/libsndfile-1.0.28
+RUN cd libsndfile-1.0.28 && make install
+
+# install pytorch
+RUN conda install -y pytorch torchvision torchaudio cpuonly -c pytorch
+
+# install additional python libraries
+RUN pip install numba==0.49.1 --user
+
+COPY requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
+
+# clear disk space
+RUN rm -rf /root/.cache
+
+# Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
+# output stream, which means that logs can be delivered to the user quickly. PYTHONDONTWRITEBYTECODE
+# keeps Python from writing the .pyc files which are unnecessary in this case. We also update
+# PATH so that the train and serve programs are found when the container is invoked.
+
+ENV SM_MODEL_DIR /opt/ml/model
+ENV SM_OUTPUT_DATA_DIR /opt/ml/output/data/algo-1
+ENV SM_CHANNEL_TRAIN /opt/ml/input/data/train
+ENV SM_CHANNEL_VALIDATION /opt/ml/input/data/validation
+
+ENV PYTHONUNBUFFERED=TRUE
+ENV PYTHONDONTWRITEBYTECODE=TRUE
+ENV PATH="/opt/program:${PATH}"
+
+# Set up the program in the image
+COPY src /opt/program
+WORKDIR /opt/program
+
+RUN chmod +x /opt/program/train
+RUN chmod +x /opt/program/serve
